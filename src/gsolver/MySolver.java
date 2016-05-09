@@ -158,8 +158,8 @@ public class MySolver extends GSolver {
     private void recursiveSearch(int key, int indiceTab) {
 
         // Test if solution is finished
-        double eval = currentSolution.evaluate() ;
         if (key==KEY_PLATFORM && indiceTab>=tabPlatforms.length) {
+            double eval = currentSolution.evaluate() ;
             // Bug v0.03 : If client demand is not satisfied, the solution is not feasible
             if (!currentSolution.isClientDemandSatisfied()) {
                 return ;
@@ -175,8 +175,7 @@ public class MySolver extends GSolver {
             return ;
         }
         else {
-            if(eval>=bestSolution.getEvaluation())
-                return;
+
             GNode currentNode = null ;
             int nodeDemand = 0 ;
 
@@ -249,8 +248,8 @@ public class MySolver extends GSolver {
                         finished = true ;
                     }
 
-                } while (finished!=true ) ;
 
+                } while (finished!=true ) ;
                 // qty of last edge = demand - sum of the qty of the other edges
                 int totqty = 0 ;
                 for (int i=0;i<currentNode.getNbrEdges()-1;i++)
@@ -260,7 +259,8 @@ public class MySolver extends GSolver {
 
                 if (lastqty>=0) {
                     currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
-
+                    /*if(currentSolution.evaluate()>bestSolution.evaluate())
+                        return;*/
                     if (!allCombinationsExplored ) {
                         // Recurs...
                         switch (key) {
