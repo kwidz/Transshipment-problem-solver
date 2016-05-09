@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# cd ~/dev/glsdsp-samebatch-supplychain/trunk/
+
+export ROOT_DIR=.
+export CLASS_DIR=$ROOT_DIR/bin
+export CLASSPATH=$CLASS_DIR
+export SRC="src/*.java src/gproblem/*.java src/gsolution/*.java src/gsolver/*.java src/gio/*.java"
+
+echo javac -Xlint -nowarn -d $CLASS_DIR $SRC 
+javac -Xlint -nowarn -d $CLASS_DIR $SRC 
+
+echo FIN DU SCRIPT
+
+exit
+

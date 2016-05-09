@@ -1,0 +1,40 @@
+Versions ag41-2016P-challenge-transshipment
+===========================================
+
+v0.04 - 12/04/2016
+------------------
+
+- Bug to fix : the enumeration method does not check for time constraint 
+
+- Bug fixed : the enumeration method now check for the demand of the client
+- Bug fixed : "EOF" was written before the edge lines in the instance data file
+- Bug fixed : the min number of depot/platform and client is 2, thus the min number
+        of nodes is 6 for the graph
+
+v0.03 - 04/04/2016
+------------------
+
+- generate random instances
+
+Example : Generation of an instance with 20 nodes
+
+    $ script/run -g data/myinstance20.txt 20
+
+
+v0.02 - 10/03/2016 
+------------------
+
+- Ajout d'une procédure d'énumération de toutes les solutions
+
+
+v0.01 - 07/03/2016 
+------------------
+
+- 3 main classes have been defined : GTransshipmentProblem,
+  GTransshipmentSolution & GSolver
+- A text file instance of the problem can be opened
+- Solutions can be evaluated
+- To create a solver, use the MySolver class with the method
+"solve()"
+
+

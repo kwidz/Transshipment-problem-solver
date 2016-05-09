@@ -67,7 +67,6 @@ fabric.properties
 *.sig
 
 pkg/
-src/
 
 
 ### Linux ###
