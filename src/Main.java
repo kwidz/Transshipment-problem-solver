@@ -39,6 +39,9 @@ public class Main {
 	final static String OPTION_ENUM_SHORT = "-se" ;
 	final static String OPTION_ENUM_LONG  = "--solve-enum" ;
 
+    final static String OPTION_BRANCHBOUND_LONG  = "--solve" ;
+    final static String OPTION_BRANCH_BOUND_SHORT  = "-s" ;
+
 	final static String OPTION_GENERATE_SHORT = "-g" ;
 	final static String OPTION_GENERATE_LONG  = "--generate" ;
 
@@ -131,6 +134,22 @@ public class Main {
 		}
 	}
 
+    /*
+    *
+    * Solver MySolver
+    *
+     */
+    private static void commandSolve(String filename) {
+        System.out.println ("commandSolveEnum") ;
+        GTransshipmentProblem pb=getProblem(filename) ;
+        if (pb!=null) {
+            System.out.println("pb!=null") ;
+            MySolver solv =	new MySolver(pb) ;
+            System.out.println("solv.start") ;
+            //solv.start() ;
+            solv.solve();
+        }
+    }
 
 	/**
 	 *
@@ -204,6 +223,17 @@ public class Main {
     				else 
     					System.out.println("Problem filename missing") ;
     			}
+                else if (args[p].equalsIgnoreCase(OPTION_BRANCH_BOUND_SHORT) || args[p].equalsIgnoreCase(OPTION_BRANCHBOUND_LONG)) {
+                    String filename = null ;
+                    if (p+1<args.length) {
+                        filename = args[++p] ;
+                        commandSolve(filename) ;
+
+                        System.exit(0) ;
+                    }
+                    else
+                        System.out.println("Problem filename missing") ;
+                }
 				// eval
     			else if (args[p].equalsIgnoreCase(OPTION_EVAL_SHORT) || args[p].equalsIgnoreCase(OPTION_EVAL_LONG)) {
     				String filename = null ;

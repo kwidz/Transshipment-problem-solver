@@ -74,8 +74,8 @@ public class MySolver extends GSolver {
 	/* (non-Javadoc)
 	 * @see gsolver.GSolver#solve()
 	 */
-	protected void solve() {
-        System.out.println("solve") ;
+    public void solve() {
+        System.out.println("My solver is solving") ;
 
         tabDepots = buildTabDepots() ;
         tabPlatforms = buildTabPlatforms() ;
@@ -158,12 +158,13 @@ public class MySolver extends GSolver {
     private void recursiveSearch(int key, int indiceTab) {
 
         // Test if solution is finished
+        double eval = currentSolution.evaluate() ;
         if (key==KEY_PLATFORM && indiceTab>=tabPlatforms.length) {
             // Bug v0.03 : If client demand is not satisfied, the solution is not feasible
-            if (!currentSolution.isClientDemandSatisfied())
+            if (!currentSolution.isClientDemandSatisfied()) {
                 return ;
+            }
 
-            double eval = currentSolution.evaluate() ;
 //System.out.println("evaluation of full currentSolution="+currentSolution) ;
 //System.exit(0) ;
             if (bestSolution==null || eval<bestSolution.getEvaluation()) {
@@ -174,8 +175,11 @@ public class MySolver extends GSolver {
             return ;
         }
         else {
+            if(eval>=bestSolution.getEvaluation())
+                return;
             GNode currentNode = null ;
             int nodeDemand = 0 ;
+
             switch (key) {
                 case KEY_DEPOT :
                     currentNode=tabDepots[indiceTab] ;
