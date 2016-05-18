@@ -200,7 +200,10 @@ public class MySolver extends GSolver {
                                     // If edge arrives to the platform
                                     if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
                                         // get the qty of the assignement of this edge
-                                        tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
+                                        if(currentSolution.getAssignement(edge.getIndice()) <= edge.getCapacity()){
+                                            tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
+                                        }
+
                                     }
                                 }
 //System.out.println("Platform "+problem.getNode(i).getIndice()+" : qty="+tabQty[problem.getNode(i).getIndice()]) ;
