@@ -176,16 +176,19 @@ public class MySolver extends GSolver {
         }
         else {
 
-            GNode currentNode = null ;
-            int nodeDemand = 0 ;
+        if(currentSolution.evaluate()>bestSolution.evaluate())
+            return;
+        GNode currentNode = null ;
+        int nodeDemand = 0 ;
+        switch (key) {
+            case KEY_DEPOT :
+                currentNode=tabDepots[indiceTab] ;
+                nodeDemand = Math.abs(currentNode.getDemand()) ;
+                break ;
+            case KEY_PLATFORM :
+                currentNode=tabPlatforms[indiceTab] ;
 
-            switch (key) {
-                case KEY_DEPOT :
-                    currentNode=tabDepots[indiceTab] ;
-                    nodeDemand = Math.abs(currentNode.getDemand()) ;
-                    break ;
-                case KEY_PLATFORM :
-                    currentNode=tabPlatforms[indiceTab] ;
+            
 
                     if (indiceTab==0) { // Do it only when platform assignment is reached
                         // compute the number of products in platforms
