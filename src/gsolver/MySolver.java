@@ -176,7 +176,7 @@ public class MySolver extends GSolver {
         }
         else {
 
-        if(currentSolution.evaluate()>bestSolution.evaluate())
+        if(currentSolution.evaluate()>bestSolution.evaluate()&&bestSolution!=null)
             return;
         GNode currentNode = null ;
         int nodeDemand = 0 ;
@@ -203,9 +203,7 @@ public class MySolver extends GSolver {
                                     // If edge arrives to the platform
                                     if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
                                         // get the qty of the assignement of this edge
-                                        if(currentSolution.getAssignement(edge.getIndice()) <= edge.getCapacity()){
-                                            tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
-                                        }
+                                        tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
 
                                     }
                                 }
@@ -240,8 +238,8 @@ public class MySolver extends GSolver {
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
-
                     if ( qty > nodeDemand  || qty > capa) {
+
                         currentSolution.setAssignement(edgeIndice, 0) ;
                         startEdge++ ;
                         if (startEdge>=currentNode.getNbrEdges()-1) { // All possible assignment have been considered for currentNode

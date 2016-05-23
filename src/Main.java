@@ -48,7 +48,14 @@ public class Main {
 	// challenge file names
 	public static final String[] challengeFilenames = {
 		"data/transshipment1.txt",
-		"data/transshipment2.txt"} ;
+		"data/transshipment2.txt",
+        "data/tshp006-01.txt",
+        "data/tshp010-03.txt",
+        "data/tshp020-01.txt",
+        "data/tshp050-02.txt",
+        "data/tshp100-03.txt",
+        "data/tshp500-02.txt"
+        } ;
 	
 	
 	//	- 10 secondes pour les petites instances 
