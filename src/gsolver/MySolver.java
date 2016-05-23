@@ -235,18 +235,15 @@ public class MySolver extends GSolver {
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
                 boolean finished = false ;
                 do {
-                    System.out.println(currentSolution);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
+
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
                     if ( qty > nodeDemand  || qty > capa) {
 
                         currentSolution.setAssignement(edgeIndice, 0) ;
+
                         startEdge++ ;
                         if (startEdge>=currentNode.getNbrEdges()-1) { // All possible assignment have been considered for currentNode
                             allCombinationsExplored = true ;
@@ -258,7 +255,6 @@ public class MySolver extends GSolver {
                         finished = true ;
                     }
 
-
                 } while (finished!=true ) ;
                 // qty of last edge = demand - sum of the qty of the other edges
                 int totqty = 0 ;
@@ -269,17 +265,33 @@ public class MySolver extends GSolver {
 
                 if (lastqty>=0) {
                     currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
-                    /*if(currentSolution.evaluate()>bestSolution.evaluate())
-                        return;*/
+
+                    int borneMin = 0;
+                    for(int i=0; i<tabDepots.length;i++){
+
+                        for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
+                            int edgeIndice=tabDepots[i].getEdgeIndice(j);
+                            int assignement=currentSolution.getAssignement(edgeIndice);
+                            if(assignement!=0)
+                                borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
+
+                        }
+
+                    }
+
+                    //System.out.println(currentSolution+" borne min : "+borneMin);
+
+
+
                     if (!allCombinationsExplored ) {
-                        System.out.println("recursive call");
                         switch (key) {
                             case KEY_DEPOT :
                                 if (indiceTab+1>=tabDepots.length) {
                                     recursiveSearch(KEY_PLATFORM, 0,0) ;
                                 }
-                                else
+                                else {
                                     recursiveSearch(KEY_DEPOT, indiceTab+1,0) ;
+                                }
                                 break ;
                             case KEY_PLATFORM :
                                 recursiveSearch(KEY_PLATFORM, indiceTab+1,0) ;
