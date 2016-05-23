@@ -83,7 +83,7 @@ public class MySolver extends GSolver {
         currentSolution = buildFirstAssignment() ;
         bestSolution = (GTransshipmentSolution) currentSolution.clone() ;
 
-        recursiveSearch (KEY_DEPOT, 0) ;
+        recursiveSearch (KEY_DEPOT, 0,0) ;
 
         System.out.println("Best solution="+bestSolution.toString()) ;
 	}
@@ -155,7 +155,7 @@ public class MySolver extends GSolver {
      *  @param indiceTab : indice of node in tabDepots or tabPlatforms
      *
      */
-    private void recursiveSearch(int key, int indiceTab) {
+    private void recursiveSearch(int key, int indiceTab, int parentBorneMin) {
 
         // Test if solution is finished
         if (key==KEY_PLATFORM && indiceTab>=tabPlatforms.length) {
@@ -176,8 +176,8 @@ public class MySolver extends GSolver {
         }
         else {
 
-        if(currentSolution.evaluate()>bestSolution.evaluate()&&bestSolution!=null)
-            return;
+
+
         GNode currentNode = null ;
         int nodeDemand = 0 ;
         switch (key) {
@@ -235,6 +235,12 @@ public class MySolver extends GSolver {
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
                 boolean finished = false ;
                 do {
+                    System.out.println(currentSolution);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
@@ -266,17 +272,17 @@ public class MySolver extends GSolver {
                     /*if(currentSolution.evaluate()>bestSolution.evaluate())
                         return;*/
                     if (!allCombinationsExplored ) {
-                        // Recurs...
+                        System.out.println("recursive call");
                         switch (key) {
                             case KEY_DEPOT :
                                 if (indiceTab+1>=tabDepots.length) {
-                                    recursiveSearch(KEY_PLATFORM, 0) ;
+                                    recursiveSearch(KEY_PLATFORM, 0,0) ;
                                 }
                                 else
-                                    recursiveSearch(KEY_DEPOT, indiceTab+1) ;
+                                    recursiveSearch(KEY_DEPOT, indiceTab+1,0) ;
                                 break ;
                             case KEY_PLATFORM :
-                                recursiveSearch(KEY_PLATFORM, indiceTab+1) ;
+                                recursiveSearch(KEY_PLATFORM, indiceTab+1,0) ;
                                 break ;
                         }
                     }

@@ -206,8 +206,14 @@ public class GTransshipmentSolution {
 	 */
 	@Override
 	public String toString() {
-		return "GTransshipmentSolution [evaluation=" + evaluation + ", tabAssignment="
-				+ Arrays.toString(tabAssignment) + " ]";
+
+        int[] tabAssignment2 = new int[problem.getNbrEdges()];
+        for (int i = 1; i <tabAssignment.length ; i++) {
+            tabAssignment2[i-1]=tabAssignment[i];
+
+        }
+        return "GTransshipmentSolution [evaluation=" + evaluation + ", tabAssignment="
+				+ Arrays.toString(tabAssignment2) + " ]";
 	}
 
 	
