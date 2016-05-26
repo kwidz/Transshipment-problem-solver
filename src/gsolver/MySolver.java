@@ -332,6 +332,7 @@ public class MySolver extends GSolver {
                 }
             }
 
+
             for (int i = 0; i < tabQty2.length; i++) {
 
                 if(tabQty2[i]>0)
@@ -438,6 +439,29 @@ public class MySolver extends GSolver {
         }
     }
 
+    private int[] calculerplateformes() {
+        int[] tabQty2 = new int[problem.getNbrNodes()+1] ;
+        for (int i=0;i<tabQty2.length;i++) tabQty2[i] = 0 ;
+
+        for (int i=0;i<problem.getNbrNodes();i++) {
+            if (problem.getNode(i).isPlatform()) {
+                tabQty2[problem.getNode(i).getIndice()] = 0 ;
+                for (int j=0;j<problem.getNbrEdges();j++) {
+                    GEdge edge = problem.getEdge(j) ;
+                    // If edge arrives to the platform
+                    if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
+                        // get the qty of the assignement of this edge
+
+                        tabQty2[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
+
+                    }
+                }
+//System.out.println("Platform "+problem.getNode(i).getIndice()+" : qty="+tabQty[problem.getNode(i).getIndice()]) ;
+            }
+        }
+        return tabQty2;
+
+    }
 
 
     /**
