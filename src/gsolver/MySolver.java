@@ -43,7 +43,7 @@ public class MySolver extends GSolver {
     private static final int KEY_PLATFORM = 1 ;
 
     private static final String TAB_KEY_NAME[]={"D","PF"} ;
-
+    boolean iter1=true;
     private GNode[] tabDepots = null ;
     private GNode[] tabPlatforms = null ;
     private GNode[] tabClients = null ;
@@ -81,7 +81,7 @@ public class MySolver extends GSolver {
         tabPlatforms = buildTabPlatforms() ;
         tabClients = buildTabClients() ;
         currentSolution = buildFirstAssignment() ;
-        bestSolution = (GTransshipmentSolution) currentSolution.clone()/*buildFirstAssignment2()*/ ;
+        bestSolution = /*(GTransshipmentSolution) currentSolution.clone()*/buildFirstAssignment2() ;
         System.out.println("##########################\n"+bestSolution+"\n#################");
         recursiveSearch (KEY_DEPOT, 0,0) ;
 
@@ -347,9 +347,12 @@ public class MySolver extends GSolver {
 
             }
 
-           if(borneMin > bestSolution.evaluate()) {
+           if(borneMin > bestSolution.evaluate()&&!iter1) {
                 return;
             }
+            else{
+               iter1=false;
+           }
 
             // starting point is first edge is set to demand of node, other are set to 0,
             // last edge is used to make the complementary to reach the total demand
@@ -368,10 +371,9 @@ public class MySolver extends GSolver {
                 // change the assignment at that level : add 1 to first edge assignment
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
                 int var = currentNode.getEdgeIndice(startEdge);
-                //currentSolution.setAssignement(var,-1);
                 boolean finished = false ;
-                boolean iter1=true;
                 do {
+
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
