@@ -81,7 +81,7 @@ public class MySolver extends GSolver {
         tabPlatforms = buildTabPlatforms() ;
         tabClients = buildTabClients() ;
         currentSolution = buildFirstAssignment() ;
-        bestSolution = buildFirstAssignment2() ;
+        bestSolution = (GTransshipmentSolution) currentSolution.clone()/*buildFirstAssignment2()*/ ;
         System.out.println("##########################\n"+bestSolution+"\n#################");
         recursiveSearch (KEY_DEPOT, 0,0) ;
 
@@ -348,7 +348,7 @@ public class MySolver extends GSolver {
             }
 
            if(borneMin > bestSolution.evaluate()) {
-                //return;
+                return;
             }
 
             // starting point is first edge is set to demand of node, other are set to 0,
@@ -367,7 +367,10 @@ public class MySolver extends GSolver {
             while (!allCombinationsExplored) {
                 // change the assignment at that level : add 1 to first edge assignment
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
+                int var = currentNode.getEdgeIndice(startEdge);
+                //currentSolution.setAssignement(var,-1);
                 boolean finished = false ;
+                boolean iter1=true;
                 do {
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
