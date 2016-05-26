@@ -82,8 +82,7 @@ public class MySolver extends GSolver {
         tabClients = buildTabClients() ;
         currentSolution = buildFirstAssignment() ;
         bestSolution = /*(GTransshipmentSolution) currentSolution.clone()*/buildFirstAssignment2() ;
-        if(bestSolution.evaluate()>currentSolution.evaluate())
-            bestSolution=(GTransshipmentSolution) currentSolution.clone();
+        
         System.out.println("##########################\n"+bestSolution+"\n#################");
         recursiveSearch (KEY_DEPOT, 0,0) ;
 
