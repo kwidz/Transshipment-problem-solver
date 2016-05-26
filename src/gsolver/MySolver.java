@@ -82,6 +82,8 @@ public class MySolver extends GSolver {
         tabClients = buildTabClients() ;
         currentSolution = buildFirstAssignment() ;
         bestSolution = /*(GTransshipmentSolution) currentSolution.clone()*/buildFirstAssignment2() ;
+        if(bestSolution.evaluate()>currentSolution.evaluate())
+            bestSolution=(GTransshipmentSolution) currentSolution.clone();
         System.out.println("##########################\n"+bestSolution+"\n#################");
         recursiveSearch (KEY_DEPOT, 0,0) ;
 
@@ -299,8 +301,11 @@ public class MySolver extends GSolver {
                 for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
                     int edgeIndice=tabDepots[i].getEdgeIndice(j);
                     int assignement=currentSolution.getAssignement(edgeIndice);
-                    if(assignement!=0)
-                        borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
+                    if(assignement!=0) {
+                        borneMin += assignement * tabDepots[i].getEdge(j).getUnitCost() + tabDepots[i].getEdge(j).getFixedCost();
+                        if(assignement> tabDepots[i].getEdge(j).getCapacity())
+                            iter1=true;
+                    }
 
                 }
 
