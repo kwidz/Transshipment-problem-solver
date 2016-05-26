@@ -366,6 +366,10 @@ public class MySolver extends GSolver {
             // Edge 2 : 0 1 1 1 2 2 3 -> max is reached
             // -----------------------------------------------
             // Edge 3 : 0 2 1 0 1 0 0
+
+            int edgeIndice = currentNode.getEdgeIndice(0) ;
+            currentSolution.setAssignement(edgeIndice, -1);
+            //changeCurrentSolutionAssignement(key, edgeIndice, -1) ;
             boolean allCombinationsExplored=false ;
             while (!allCombinationsExplored) {
                 // change the assignment at that level : add 1 to first edge assignment
@@ -374,7 +378,7 @@ public class MySolver extends GSolver {
                 boolean finished = false ;
                 do {
 
-                    int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
+                    edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
                     if ( qty > nodeDemand  || qty > capa) {
