@@ -95,16 +95,28 @@ public class MySolver extends GSolver {
         for (int i=0;i<problem.getNbrNodes();i++) {
             GNode node = problem.getNode(i) ;
             if (node.isDepot()) {
-                //Autre heuristique tout mettre sur le premier et ensuite dispatcher !!!!
-
-                // All edges are set to 0, except
+                // prise en compte de la capacité des arcs
+                int qty=-node.getDemand();
                 for (int j=0;j<node.getNbrEdges()-1;j++) {
                     int indice = node.getEdgeIndice(j) ;
-                    sol.setAssignement(indice, 0) ;
+                    if(qty>0) {
+                        int capacity=node.getEdge(j).getCapacity();
+                        if(capacity>=qty){
+                            sol.setAssignement(indice, qty);
+                            qty=0;
+                        }
+                        else{
+                            sol.setAssignement(indice,capacity);
+                            qty-=capacity;
+                        }
+                    }
+                    else
+                        sol.setAssignement(indice, 0) ;
+
                 }
                 // Last edge is fully loaded
-                int indice = node.getEdgeIndice(node.getNbrEdges()-1) ;
-                sol.setAssignement(indice, -node.getDemand()) ;
+                //int indice = node.getEdgeIndice(node.getNbrEdges()-1) ;
+                //sol.setAssignement(indice, -node.getDemand()) ;
             }
         }
 
@@ -121,21 +133,23 @@ public class MySolver extends GSolver {
                 for (int j=0;j<problem.getNbrEdges();j++) {
                     GEdge edge = problem.getEdge(j) ;
                     // If edge arrives to the platform
-                    if (edge.getEndingNode().getIndice()==node.getIndice()) { //si l'edge pointe sur la platform alors ...
+                    if (edge.getEndingNode().getIndice()==node.getIndice()) {
                         // get the qty of the assignement of this edge
-                        total += sol.getAssignement(edge.getIndice()) ; //total de produit qu'il y a sur ta platforme
+                        total += sol.getAssignement(edge.getIndice()) ;
                     }
                 }
 
                 int remainingStock = total ;
                 // All edges are set to 0, except
                 for (int j=0;j<node.getNbrEdges();j++) {
-                    //ici on prend les edges qui partent de la platforme et on essaye de distribuer
                     GEdge edge = node.getEdge(j) ;
-                    GNode client = edge.getEndingNode() ; //pointe sur les clients
+                    GNode client = edge.getEndingNode() ;
+
                     int remainingDemand = tabRemainingDemand[client.getIndice()] ;
 
-                    int qty = Math.min(remainingStock, remainingDemand) ; //prise en compte de la capacité
+                    int qty = Math.min(remainingStock, remainingDemand) ;
+                    remainingStock-=qty;
+                    tabRemainingDemand[client.getIndice()]-=qty;
 
                     sol.setAssignement(edge.getIndice(), qty) ;
                 }
@@ -180,8 +194,68 @@ public class MySolver extends GSolver {
         else {
 
 
+            int borneMin = 0;
+            for(int i=0; i<tabDepots.length;i++){
 
-        GNode currentNode = null ;
+                for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
+                    int edgeIndice=tabDepots[i].getEdgeIndice(j);
+                    int assignement=currentSolution.getAssignement(edgeIndice);
+                    if(assignement!=0)
+                        borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
+
+                }
+
+            }
+
+            int[] tabQty2 = new int[problem.getNbrNodes()+1] ;
+                        for (int i=0;i<tabQty2.length;i++) tabQty2[i] = 0 ;
+
+                        for (int i=0;i<problem.getNbrNodes();i++) {
+                            if (problem.getNode(i).isPlatform()) {
+                                tabQty2[problem.getNode(i).getIndice()] = 0 ;
+                                for (int j=0;j<problem.getNbrEdges();j++) {
+                                    GEdge edge = problem.getEdge(j) ;
+                                    // If edge arrives to the platform
+                                    if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
+                                        // get the qty of the assignement of this edge
+                                        borneMin+=problem.getNode(i).getCost()*currentSolution.getAssignement(edge.getIndice());
+                                        tabQty2[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
+
+                                    }
+                                }
+//System.out.println("Platform "+problem.getNode(i).getIndice()+" : qty="+tabQty[problem.getNode(i).getIndice()]) ;
+                            }
+                        }
+
+            for (int i = 0; i < tabQty2.length; i++) {
+
+                if(tabQty2[i]>0)
+                {
+                    GNode currentPlateform=problem.getNode(i-1);
+                    int qty=tabQty2[i];
+                    double min=-1;
+
+                    for (GEdge j : currentPlateform.getTabEdges()) {
+                        if(min==-1 || ((j.getFixedCost() + (j.getUnitCost()*qty) ) < min)){
+                            if(j.getEndingNode().getDemand()>=qty)
+                                min=j.getFixedCost() + j.getUnitCost()*qty;
+                        }
+                    }
+
+                    borneMin+=min;
+
+                }
+
+            }
+
+            if(borneMin> bestSolution.evaluate()) {
+                return;
+            }
+
+
+
+
+            GNode currentNode = null ;
         int nodeDemand = 0 ;
         switch (key) {
             case KEY_DEPOT :
@@ -190,6 +264,8 @@ public class MySolver extends GSolver {
                 break ;
             case KEY_PLATFORM :
                 currentNode=tabPlatforms[indiceTab] ;
+
+            
 
                     if (indiceTab==0) { // Do it only when platform assignment is reached
                         // compute the number of products in platforms
@@ -205,9 +281,6 @@ public class MySolver extends GSolver {
                                     if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
                                         // get the qty of the assignement of this edge
                                         tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
-                                        //il faut prendre en compte les capacité avant
-                                        tabQty[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
-
 
                                     }
                                 }
@@ -234,6 +307,7 @@ public class MySolver extends GSolver {
             // Edge 3 : 0 2 1 0 1 0 0
             boolean allCombinationsExplored=false ;
             while (!allCombinationsExplored) {
+
                 // change the assignment at that level : add 1 to first edge assignment
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
                 boolean finished = false ;
@@ -257,7 +331,6 @@ public class MySolver extends GSolver {
                         currentSolution.setAssignement(edgeIndice, qty) ;
                         finished = true ;
                     }
-//en fait le assignment c'est la dessus que je dois agir
 
                 } while (finished!=true ) ;
                 // qty of last edge = demand - sum of the qty of the other edges
@@ -269,19 +342,6 @@ public class MySolver extends GSolver {
 
                 if (lastqty>=0) {
                     currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
-
-                    int borneMin = 0;
-                    for(int i=0; i<tabDepots.length;i++){
-
-                        for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
-                            int edgeIndice=tabDepots[i].getEdgeIndice(j);
-                            int assignement=currentSolution.getAssignement(edgeIndice);
-                            if(assignement!=0)
-                                borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
-
-                        }
-
-                    }
 
                     //System.out.println(currentSolution+" borne min : "+borneMin);
 
