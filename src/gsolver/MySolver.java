@@ -242,7 +242,13 @@ public class MySolver extends GSolver {
                 return ;
             }
 
-
+            int globalTime = 0;
+            for (int i =0; i<currentSolution.getProblem().getNbrEdges();i++){
+                if (currentSolution.getAssignement(i) > 0){
+                    globalTime += currentSolution.getProblem().getEdge(i).getTime();
+                }
+            }
+            for (int i=0; i<)
 //System.out.println("evaluation of full currentSolution="+currentSolution) ;
 //System.exit(0) ;
             if (bestSolution==null || eval<bestSolution.getEvaluation()) {
