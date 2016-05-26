@@ -263,9 +263,12 @@ System.out.println("eval="+eval+" ; bestSolution.getEvaluation()="+bestSolution.
 				int lastqty = nodeDemand - totqty ;
 				
 				if (lastqty>=0) {
-					currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;	
-					
-					if (!allCombinationsExplored ) {
+					currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
+                    int edgeindice=currentNode.getEdgeIndice(currentNode.getNbrEdges()-1);
+                    //System.out.println(currentSolution+" borne min : "+borneMin);
+                    if (!allCombinationsExplored &&
+                            !(currentSolution.getAssignement(edgeindice)> currentNode.getEdge(currentNode.getNbrEdges()-1).getCapacity())
+                            ) {
 
                         // Recurs...
 						switch (key) {

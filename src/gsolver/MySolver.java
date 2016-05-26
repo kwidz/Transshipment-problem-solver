@@ -81,14 +81,14 @@ public class MySolver extends GSolver {
         tabPlatforms = buildTabPlatforms() ;
         tabClients = buildTabClients() ;
         currentSolution = buildFirstAssignment() ;
-        bestSolution = (GTransshipmentSolution) currentSolution.clone() ;
-
+        bestSolution = buildFirstAssignment2() ;
+        System.out.println("##########################\n"+bestSolution+"\n#################");
         recursiveSearch (KEY_DEPOT, 0,0) ;
 
         System.out.println("Best solution="+bestSolution.toString()) ;
 	}
 
-    private GTransshipmentSolution buildFirstAssignment() {
+    private GTransshipmentSolution buildFirstAssignment2() {
         GTransshipmentSolution sol = new GTransshipmentSolution(problem) ;
 
         // First part : depot
@@ -163,6 +163,64 @@ public class MySolver extends GSolver {
         return sol;
     }
 
+    private GTransshipmentSolution buildFirstAssignment() {
+        GTransshipmentSolution sol = new GTransshipmentSolution(problem) ;
+
+        // First part : depot
+        for (int i=0;i<problem.getNbrNodes();i++) {
+            GNode node = problem.getNode(i) ;
+            if (node.isDepot()) {
+                // All edges are set to 0, except
+                for (int j=0;j<node.getNbrEdges()-1;j++) {
+                    int indice = node.getEdgeIndice(j) ;
+                    sol.setAssignement(indice, 0) ;
+                }
+                // Last edge is fully loaded
+                int indice = node.getEdgeIndice(node.getNbrEdges()-1) ;
+                sol.setAssignement(indice, -node.getDemand()) ;
+            }
+        }
+
+        // Second part : platform
+        tabRemainingDemand = new int[problem.getNbrNodes()+1] ;
+        for (int i=0;i<problem.getNbrNodes();i++)
+            tabRemainingDemand[problem.getNode(i).getIndice()] = problem.getNode(i).getDemand() ;
+
+        for (int i=0;i<problem.getNbrNodes();i++) {
+            GNode node = problem.getNode(i) ;
+            if (node.isPlatform()) {
+                // How many part comes to the platform ?
+                int total = 0 ;
+                for (int j=0;j<problem.getNbrEdges();j++) {
+                    GEdge edge = problem.getEdge(j) ;
+                    // If edge arrives to the platform
+                    if (edge.getEndingNode().getIndice()==node.getIndice()) {
+                        // get the qty of the assignement of this edge
+                        total += sol.getAssignement(edge.getIndice()) ;
+                    }
+                }
+
+                int remainingStock = total ;
+                // All edges are set to 0, except
+                for (int j=0;j<node.getNbrEdges();j++) {
+                    GEdge edge = node.getEdge(j) ;
+                    GNode client = edge.getEndingNode() ;
+                    int remainingDemand = tabRemainingDemand[client.getIndice()] ;
+
+                    int qty = Math.min(remainingStock, remainingDemand) ;
+
+                    sol.setAssignement(edge.getIndice(), qty) ;
+                }
+            }
+        }
+
+        sol.evaluate();
+
+        System.out.println("First assignment="+sol.toString()) ;
+
+        return sol;
+    }
+
     /**
      *  recursive search following the basic principle :
      *  1. assign a flow to every depot
@@ -187,7 +245,7 @@ public class MySolver extends GSolver {
             if (bestSolution==null || eval<bestSolution.getEvaluation()) {
                 System.out.println("eval="+eval+" ; bestSolution.getEvaluation()="+bestSolution.getEvaluation()) ;
                 bestSolution = (GTransshipmentSolution) currentSolution.clone() ;
-                System.out.println("New best solution found: "+bestSolution.toString()+"\n") ;
+                System.out.println("New best solution found: " + bestSolution.toString()+"\n") ;
             }
             return ;
         }
@@ -289,8 +347,8 @@ public class MySolver extends GSolver {
 
             }
 
-            if(currentSolution.evaluate()> bestSolution.evaluate()) {
-                return;
+           if(borneMin > bestSolution.evaluate()) {
+                //return;
             }
 
             // starting point is first edge is set to demand of node, other are set to 0,
@@ -307,20 +365,15 @@ public class MySolver extends GSolver {
             // Edge 3 : 0 2 1 0 1 0 0
             boolean allCombinationsExplored=false ;
             while (!allCombinationsExplored) {
-
                 // change the assignment at that level : add 1 to first edge assignment
                 int startEdge = 0 ; // indice of starting edge in tabEdges of currentNode
                 boolean finished = false ;
                 do {
-
-
                     int edgeIndice = currentNode.getEdgeIndice(startEdge) ;
                     int qty = currentSolution.getAssignement(edgeIndice)+1 ;
                     int capa = problem.getEdgeFromIndice(edgeIndice).getCapacity() ;
                     if ( qty > nodeDemand  || qty > capa) {
-
                         currentSolution.setAssignement(edgeIndice, 0) ;
-
                         startEdge++ ;
                         if (startEdge>=currentNode.getNbrEdges()-1) { // All possible assignment have been considered for currentNode
                             allCombinationsExplored = true ;
@@ -331,26 +384,19 @@ public class MySolver extends GSolver {
                         currentSolution.setAssignement(edgeIndice, qty) ;
                         finished = true ;
                     }
-
                 } while (finished!=true ) ;
                 // qty of last edge = demand - sum of the qty of the other edges
                 int totqty = 0 ;
                 for (int i=0;i<currentNode.getNbrEdges()-1;i++)
                     totqty += currentSolution.getAssignement(currentNode.getEdgeIndice(i)) ;
-
                 int lastqty = nodeDemand - totqty ;
-
                 if (lastqty>=0) {
                     currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
-
+                    int edgeindice=currentNode.getEdgeIndice(currentNode.getNbrEdges()-1);
                     //System.out.println(currentSolution+" borne min : "+borneMin);
-
-
-
-
-
-
-                    if (!allCombinationsExplored ) {
+                    if (!allCombinationsExplored &&
+                            !(currentSolution.getAssignement(edgeindice)> currentNode.getEdge(currentNode.getNbrEdges()-1).getCapacity())
+                            ) {
                         switch (key) {
                             case KEY_DEPOT :
                                 if (indiceTab+1>=tabDepots.length) {
