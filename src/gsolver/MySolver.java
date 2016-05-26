@@ -242,6 +242,7 @@ public class MySolver extends GSolver {
                 return ;
             }
 
+
 //System.out.println("evaluation of full currentSolution="+currentSolution) ;
 //System.exit(0) ;
             if (bestSolution==null || eval<bestSolution.getEvaluation()) {
@@ -375,6 +376,7 @@ public class MySolver extends GSolver {
             int edgeIndice = currentNode.getEdgeIndice(0) ;
             currentSolution.setAssignement(edgeIndice, -1);
             //changeCurrentSolutionAssignement(key, edgeIndice, -1) ;
+
             boolean allCombinationsExplored=false ;
             while (!allCombinationsExplored) {
                 // change the assignment at that level : add 1 to first edge assignment
