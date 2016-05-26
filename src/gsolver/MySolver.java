@@ -248,7 +248,18 @@ public class MySolver extends GSolver {
                     globalTime += currentSolution.getProblem().getEdge(i).getTime();
                 }
             }
-            for (int i=0; i<)
+            int[] tab = calculerplateformes();
+            for (int i=0; i<tab.length;i++){
+                if (tab[i] > 0){
+                    GNode currentPlatforme = problem.getNode(i-1);
+                    globalTime += currentPlatforme.getTime();
+                }
+            }
+            //Attention ça pèse
+            if (globalTime > problem.getT()){
+                System.out.println("Error transhipment time, you need a Tardis");
+                return;
+            }
 //System.out.println("evaluation of full currentSolution="+currentSolution) ;
 //System.exit(0) ;
             if (bestSolution==null || eval<bestSolution.getEvaluation()) {
