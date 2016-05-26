@@ -194,65 +194,6 @@ public class MySolver extends GSolver {
         else {
 
 
-            int borneMin = 0;
-            for(int i=0; i<tabDepots.length;i++){
-
-                for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
-                    int edgeIndice=tabDepots[i].getEdgeIndice(j);
-                    int assignement=currentSolution.getAssignement(edgeIndice);
-                    if(assignement!=0)
-                        borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
-
-                }
-
-            }
-
-            int[] tabQty2 = new int[problem.getNbrNodes()+1] ;
-                        for (int i=0;i<tabQty2.length;i++) tabQty2[i] = 0 ;
-
-                        for (int i=0;i<problem.getNbrNodes();i++) {
-                            if (problem.getNode(i).isPlatform()) {
-                                tabQty2[problem.getNode(i).getIndice()] = 0 ;
-                                for (int j=0;j<problem.getNbrEdges();j++) {
-                                    GEdge edge = problem.getEdge(j) ;
-                                    // If edge arrives to the platform
-                                    if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
-                                        // get the qty of the assignement of this edge
-                                        borneMin+=problem.getNode(i).getCost()*currentSolution.getAssignement(edge.getIndice());
-                                        tabQty2[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
-
-                                    }
-                                }
-//System.out.println("Platform "+problem.getNode(i).getIndice()+" : qty="+tabQty[problem.getNode(i).getIndice()]) ;
-                            }
-                        }
-
-            for (int i = 0; i < tabQty2.length; i++) {
-
-                if(tabQty2[i]>0)
-                {
-                    GNode currentPlateform=problem.getNode(i-1);
-                    int qty=tabQty2[i];
-                    double min=-1;
-
-                    for (GEdge j : currentPlateform.getTabEdges()) {
-                        if(min==-1 || ((j.getFixedCost() + (j.getUnitCost()*qty) ) < min)){
-                            if(j.getEndingNode().getDemand()>=qty)
-                                min=j.getFixedCost() + j.getUnitCost()*qty;
-                        }
-                    }
-
-                    borneMin+=min;
-
-                }
-
-            }
-
-            if(borneMin> bestSolution.evaluate()) {
-                return;
-            }
-
-
 
 
             GNode currentNode = null ;
@@ -292,6 +233,65 @@ public class MySolver extends GSolver {
                     break ;
             }
             assert (currentNode!=null) : currentNode ;
+
+
+            int borneMin = 0;
+            for(int i=0; i<tabDepots.length;i++){
+
+                for (int j = 0; j < tabDepots[i].getTabEdges().length; j++) {
+                    int edgeIndice=tabDepots[i].getEdgeIndice(j);
+                    int assignement=currentSolution.getAssignement(edgeIndice);
+                    if(assignement!=0)
+                        borneMin+=assignement*tabDepots[i].getEdge(j).getUnitCost()+tabDepots[i].getEdge(j).getFixedCost();
+
+                }
+
+            }
+
+            int[] tabQty2 = new int[problem.getNbrNodes()+1] ;
+            for (int i=0;i<tabQty2.length;i++) tabQty2[i] = 0 ;
+
+            for (int i=0;i<problem.getNbrNodes();i++) {
+                if (problem.getNode(i).isPlatform()) {
+                    tabQty2[problem.getNode(i).getIndice()] = 0 ;
+                    for (int j=0;j<problem.getNbrEdges();j++) {
+                        GEdge edge = problem.getEdge(j) ;
+                        // If edge arrives to the platform
+                        if (edge.getEndingNode().getIndice()==problem.getNode(i).getIndice()) {
+                            // get the qty of the assignement of this edge
+                            borneMin+=problem.getNode(i).getCost()*currentSolution.getAssignement(edge.getIndice());
+                            tabQty2[problem.getNode(i).getIndice()] += currentSolution.getAssignement(edge.getIndice()) ;
+
+                        }
+                    }
+//System.out.println("Platform "+problem.getNode(i).getIndice()+" : qty="+tabQty[problem.getNode(i).getIndice()]) ;
+                }
+            }
+
+            for (int i = 0; i < tabQty2.length; i++) {
+
+                if(tabQty2[i]>0)
+                {
+                    GNode currentPlateform=problem.getNode(i-1);
+                    int qty=tabQty2[i];
+                    double min=-1;
+
+                    for (GEdge j : currentPlateform.getTabEdges()) {
+                        if(min==-1 || ((j.getFixedCost() + (j.getUnitCost()*qty) ) < min)){
+                            if(j.getEndingNode().getDemand()>=qty)
+                                min=j.getFixedCost() + j.getUnitCost()*qty;
+                        }
+                    }
+
+                    borneMin+=min;
+
+                }
+
+            }
+
+            if(currentSolution.evaluate()> bestSolution.evaluate()) {
+                return;
+            }
 
             // starting point is first edge is set to demand of node, other are set to 0,
             // last edge is used to make the complementary to reach the total demand
@@ -344,6 +344,9 @@ public class MySolver extends GSolver {
                     currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;
 
                     //System.out.println(currentSolution+" borne min : "+borneMin);
+
+
+
 
 
 

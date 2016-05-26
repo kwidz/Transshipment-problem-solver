@@ -266,7 +266,8 @@ System.out.println("eval="+eval+" ; bestSolution.getEvaluation()="+bestSolution.
 					currentSolution.setAssignement(currentNode.getEdgeIndice(currentNode.getNbrEdges()-1), lastqty) ;	
 					
 					if (!allCombinationsExplored ) {
-						// Recurs...
+
+                        // Recurs...
 						switch (key) {
 						case KEY_DEPOT : 
 							if (indiceTab+1>=tabDepots.length) {
