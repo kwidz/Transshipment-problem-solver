@@ -1,0 +1,74 @@
+\documentclass[french]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper]{geometry}
+\usepackage{babel}
+
+
+\author{Victor SENE}
+\title{Projet AG41 - Problème de transbordement}
+\begin{document}
+\maketitle
+Dans ce projet, nous avons pour tâche de trouver un de trouver une solution optimale à un problème de transbordement en programmant un solveur capable de prendre en considération plusieurs graphes contraints en paramètre. Nous allons dans un premier temps analyser le problème mathématiquement puis nous considérons les solutions pour résoudre le problème de façon générale.
+
+\section{Modèle mathématique}
+	\subsection{Paramètres}
+	Tout d'abord commençons par définir les différents paramètres qui comptabilise le nombre nœuds. Ces paramètres sont de type entier : 
+	\begin{itemize}
+		\item $f$ : représente le nombre de fournisseurs
+		\item $p$ : représente nombre de plateformes de transbordement
+		\item $c$ : représente nombre de clients
+	\end{itemize}
+	
+	À présent voici les propriétés des arcs partant d'un nœud i vers un nœud j :
+	\begin{itemize}
+		\item$u_{ij}$ : capacité d'un arc de type entier
+		\item $c_{ij}$ : coût fixe d'utilisation d'un arc
+		\item $h_{ij}$ : coût par objet transporté
+		\item $t_{ij}$ : temps de transport sur l'arc de type entier 
+	\end{itemize}
+	
+	Et enfin pour les plateformes i :
+	\begin{itemize}
+		\item $g_{i}$ : coût de transbordement unitaire
+		\item $s_{i}$ : temps de transbordement de type entier
+	\end{itemize}
+	
+	\subsection{Variables}
+	Dans ce problème notre variable principale concerne la quantité de produit sur un arc :
+	\begin{itemize}
+		\item $x_{ij}$ : nombre de produit acheminé sur un arc dont le départ est i et va vers j.
+		\item Pour les besoins du modèle mathématique j'introduis une variable binaire qui me permettra d'ignorer les coûts fixes des arcs non-utilisés $y_{ij}$.
+	\end{itemize}
+	\subsection{Objectif}
+	Nous avons pour but dans ce problème de minimiser le coût du transport tout en maximisant le nombre de produit transporté.
+	
+	$\sum_{i=1}^{f} \sum_{j=1}^{p}(x_{ij} \times h_{ij} + y_{ij} \times (c_{ij} + g_{j}))) + \sum_{i=1}^{p} \sum_{j=1}^{c}(x_{ij} \times h_{ij} + y_{ij} \times c_{ij}) $
+	
+	\subsection{Contraintes}
+	\begin{itemize}
+		\item $x_{ij} \leq u_{ij} * y_{ij}$ : ainsi l'arc ne supportera pas plus que ça capacité et s'il n'est pas utilisé alors rien ne doit être transporté sur l'arc.
+		\item $t_{ij} + s_{i} + t_{ij} \leq T$ : T est le temps de trajet maximum à ne pas dépasser. 
+		\item $\forall i, \sum_{j=1}^{n+f+c}(x_{ij} - x_{ji}) = - b_{i}$ : ceci est une contrainte de conservation des marchandises afin que ce qui parte d'un fournisseur soit égal à ce que reçois le client.
+	\end{itemize}
+	
+\section{Résolution}
+Afin de pouvoir structurer la recherche, il sera judicieux d'utiliser une méthode de résolution généraliste tel que le Branch and Bounds sur la base d'un algorithme de Little. Le but sera de faire une recherche arborescente avec comme critère pour séparer les branches de l'arbre binaire la condition de passage ou non par un arc donné.
+Un algorithme de Fulkerson sera utilisé en complément pour trouver des flux viables pour le transport de marchandise.
+
+
+\section{Implémentation}
+L'objectif ici est de montrer l'évolution de la réflexion au court du projet. Nous pouvons agir sur plusieurs points afin d'accélérer la recherche : l'efficacité de la borne min, l'approximation par la première solution, l'ordre de visite des edges en fonctions de leur coût.
+	\subsection{Recherche d'une borne min}
+	On d'abord nous avons utilisé l'évaluation de la première assignation comme borne permettant la coupe des arcs.
+	Puis ....
+	Enfin ....
+	
+	\subsection{La première solution}
+	Après une étude de la première solution fournie dans le code nous avons décidé de chercher un moyen de construire plus efficacement cette première solution.
+	
+	\subsection{Nos solutions}
+	
+
+\end{document}
