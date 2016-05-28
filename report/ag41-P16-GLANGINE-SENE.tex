@@ -4,9 +4,38 @@
 \usepackage{lmodern}
 \usepackage[a4paper]{geometry}
 \usepackage{babel}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
 
 
-\author{Victor SENE}
+
+\author{Geoffrey GLANGINE \& Victor SENE}
 \title{Projet AG41 - Problème de transbordement}
 \begin{document}
 \maketitle
@@ -54,21 +83,79 @@ Dans ce projet, nous avons pour tâche de trouver un de trouver une solution opt
 	\end{itemize}
 	
 \section{Résolution}
-Afin de pouvoir structurer la recherche, il sera judicieux d'utiliser une méthode de résolution généraliste tel que le Branch and Bounds sur la base d'un algorithme de Little. Le but sera de faire une recherche arborescente avec comme critère pour séparer les branches de l'arbre binaire la condition de passage ou non par un arc donné.
-Un algorithme de Fulkerson sera utilisé en complément pour trouver des flux viables pour le transport de marchandise.
+Afin de pouvoir structurer la recherche, nous avons préféré une méthode de résolution généraliste tel que le Branch and Bounds car l'utilisation de celui-ci pour des problèmes légèrement différents serait possible. Le but sera de faire une recherche arborescente avec comme critère pour séparer les branches de l'arbre binaire la condition de passage ou non par un arc donné. Le coût de la solution sera évaluée à chaque nœud permettant de réduire l'arbre si ce coup est supérieur à celui de la borne min. 
+Un algorithme de Fulkerson pourra être envisagé en complément pour trouver des flux viables pour le transport de marchandise.
 
 
 \section{Implémentation}
-L'objectif ici est de montrer l'évolution de la réflexion au court du projet. Nous pouvons agir sur plusieurs points afin d'accélérer la recherche : l'efficacité de la borne min, l'approximation par la première solution, l'ordre de visite des edges en fonctions de leur coût.
+L'objectif ici est de montrer l'évolution de la réflexion au court du projet. Tout d'abord nous pouvons agir sur plusieurs points afin d'accélérer la recherche : l'efficacité de la borne min, l'approximation par la première solution, l'ordre de visite des edges en fonctions de leur coût. Ainsi nous avons commencé par chercher un moyen d'améliorer notre borne min.
 	\subsection{Recherche d'une borne min}
-	On d'abord nous avons utilisé l'évaluation de la première assignation comme borne permettant la coupe des arcs.
+	La première borne min utilisée était calculée à partir de l'évaluation de la solution de départ comme borne permettant la coupe des arcs.
 	Puis ....
 	Enfin ....
 	
 	\subsection{La première solution}
-	Après une étude de la première solution fournie dans le code nous avons décidé de chercher un moyen de construire plus efficacement cette première solution.
+	Après une étude de la première solution fournie dans le code nous avons décidé de chercher un moyen de construire plus efficacement cette première solution. Nous avons ainsi décidé de remplir les arcs aux maximum de leur capacité et de répartir ainsi les produits jusqu'à avoir répondu à la demande.
+	
+	Pour un dépôts :
+	\begin{lstlisting}[language=Java]
+		for (int i=0;i<problem.getNbrNodes();i++) {
+			GNode node = problem.getNode(i) ;
+			if (node.isDepot()) {
+				int qty=-node.getDemand();
+				for (int j=0;j<node.getNbrEdges()-1;j++) {
+					int indice = node.getEdgeIndice(j) ;
+					//Prise en compte de la capacite des arcs
+					if(qty>0) {
+						int capacity=node.getEdge(j).getCapacity();
+						if(capacity>=qty){
+							sol.setAssignement(indice, qty);
+							qty=0;
+						}
+						else{
+							sol.setAssignement(indice,capacity);
+							qty-=capacity;
+						}
+					}
+					else
+						sol.setAssignement(indice, 0) ;
+				}
+			}
+		}
+	\end{lstlisting}
+	Pour un nœud de transbordement nous testons les différents arcs et s'ils pointent vers ce nœud alors nous ajoutons les produits sur le nœud et actualisons le coût total de la solution.
+	
+	\subsection{Capacité des arcs}
+	Si chaque arc vise à relié deux nœuds ils ne sont pas tous identiques. Il faut donc prendre en compte la capacité de chaque arc afin de ne pas y assigner plus de produit que possible. Nous avons donc commencé par le prendre en compte dans la solution initiale :
+	\begin{lstlisting}[language=Java, caption=Test capacité des arcs]
+		if(capacity>=qty){
+			sol.setAssignement(indice, qty);
+			qty=0;
+		}
+		else{
+			sol.setAssignement(indice,capacity);
+			qty-=capacity;
+		}
+	\end{lstlisting}
+	Lors du parcours du graphe et de l'ajout des produits aux différents arcs il faut aussi prendre en compte cette capacité. Nous avons remarqué que cependant tous les produits étaient assignés au dernier arc si on avait pas réussi à répartir sur les arcs précédent. Nous avons donc ajouté une condition empêchant la récursivité si les produits ne sont pas bien répartis :
+	\begin{lstlisting}[language=Java]
+		if (!allCombinationsExplored &&
+			!(currentSolution.getAssignement(edgeindice) > currentNode.getEdge(currentNode.getNbrEdges()-1).getCapacity())) 
+			{ [...] }
+	\end{lstlisting}
+	
 	
 	\subsection{Nos solutions}
+	Nous avons remarqué que nos résultats approchent la solution optimale demandée mais ne la donne pas toujours car notre méthode d'énumération des chemins possibles n'est pas complètement fiables. Cependant pour un algorithme généralisé il nous semble que le temps de calcul des solutions est relativement raisonnable :
+
 	
+\section{Des problèmes et des solutions}
+	\subsection{Les problèmes rencontrés}
+	Nous avons décidé d'utiliser le code fourni pour nous baser dessus et le rendre rapidement opérationnel. Cependant le volume à assimilé que représentait déjà à la base le programme nous a fortement ralenti. Si nous avions à refaire le projet nous repartirions de zéro pour une meilleur maîtrise de l'ensemble du code.
+	Nous aurions pu aussi améliorer notre démarche en utilisant un langage plus pratique pour ce genre de problème : le Python.
+	
+	\subsection{Les optimisations possibles}
+	Il nous ait clairement apparu que nous pourrions améliorer notre projet en revoyant notre méthode d'énumération mais cela changerait aussi l'essence même du parcours du graphe impliquant des changements assez profond dans notre code.
+	Il nous restera encore aussi à afficher un message d'erreur lorsque les solutions ne sont pas possibles.
 
 \end{document}
