@@ -48,7 +48,7 @@ public abstract class GSolver extends Thread {
 	/**
 	 * maximum time to run the solver
 	 */
-	protected long solvingTime=-1 ;
+	protected long solvingTime=900000000 ;
 	
 	/**
 	 * random generator to use for stochastic techniques
@@ -93,6 +93,14 @@ public abstract class GSolver extends Thread {
 		long time = new Date().getTime() ; 
 		elapsedTime = time-startTime ;
 		return elapsedTime;
+	}
+
+	public boolean getEnoughtTime(){
+		if (elapsedTime <= solvingTime){
+			return true;
+		}
+		else
+			return false;
 	}
 
 	/**

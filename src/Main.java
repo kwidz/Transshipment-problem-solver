@@ -155,14 +155,15 @@ public class Main {
     *
      */
     private static void commandSolve(String filename) {
-        System.out.println ("commandSolveEnum") ;
+        System.out.println ("commandSolve") ;
         GTransshipmentProblem pb=getProblem(filename) ;
         if (pb!=null) {
             System.out.println("pb!=null") ;
             MySolver solv =	new MySolver(pb) ;
             System.out.println("solv.start") ;
             //solv.start() ;
-            solv.solve();
+            //solv.solve();
+			solv.run();
         }
     }
 
