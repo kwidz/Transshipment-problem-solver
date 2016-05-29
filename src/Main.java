@@ -154,16 +154,20 @@ public class Main {
     * Solver MySolver
     *
      */
-    private static void commandSolve(String filename) {
+    private static void commandSolve(String filename, String time) {
         System.out.println ("commandSolve") ;
+        System.out.println("temps pour resoudre le problème : "+ time+" millisecondes.");
+        int temps = Integer.parseInt(time);
         GTransshipmentProblem pb=getProblem(filename) ;
         if (pb!=null) {
             System.out.println("pb!=null") ;
             MySolver solv =	new MySolver(pb) ;
             System.out.println("solv.start") ;
-            //solv.start() ;
+            if(temps>0)
+                solv.setSolvingTime(temps);
+            solv.run() ;
             //solv.solve();
-			solv.run();
+
         }
     }
 
@@ -243,7 +247,11 @@ public class Main {
                     String filename = null ;
                     if (p+1<args.length) {
                         filename = args[++p] ;
-                        commandSolve(filename) ;
+                        if (p+1<args.length) {
+                            commandSolve(filename, args[++p]);
+                        }
+                        else
+                            commandSolve(filename,"-1");
 
                         System.exit(0) ;
                     }
