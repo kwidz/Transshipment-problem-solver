@@ -18,6 +18,7 @@
  */
 package gsolver;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.text.TabableView;
@@ -94,32 +95,42 @@ public class MySolver extends GSolver {
 
         // First part : depot
         for (int i=0;i<problem.getNbrNodes();i++) {
-            GNode node = problem.getNode(i) ;
+            GNode node = problem.getNode(i);
+            for (int j = 0; j < node.getNbrEdges() - 1; j++) {
+
+                int ind = node.getEdgeIndice(j);
+                sol.setAssignement(ind, 0);
+            }
             if (node.isDepot()) {
-                // prise en compte de la capacité des arcs
-                int qty=-node.getDemand();
-                for (int j=0;j<node.getNbrEdges()-1;j++) {
-                    int indice = node.getEdgeIndice(j) ;
-                    if(qty>0) {
-                        int capacity=node.getEdge(j).getCapacity();
-                        if(capacity>=qty){
-                            sol.setAssignement(indice, qty);
-                            qty=0;
-                        }
-                        else{
-                            sol.setAssignement(indice,capacity);
-                            qty-=capacity;
+                boolean allsent = false;
+                double qty = -node.getDemand();
+                ArrayList<Integer> arcUsed = new ArrayList<Integer>();
+                while (!allsent) {
+                    // Oncherche l'arc le moins couteux qui n'a pas encore été utilisé.
+                    int min = -1;
+                    for (int j = 0; j < node.getNbrEdges() - 1; j++) {
+                        if (!(arcUsed.contains(new Integer(j)))) {
+
+                            if (min == -1)
+                            {
+                                min = j;
+                            }else if ((Math.min(qty, node.getEdge(j).getCapacity()) * node.getEdge(j).getUnitCost() + node.getEdge(j).getFixedCost()) < (Math.min(qty, node.getEdge(min).getCapacity()) * node.getEdge(min).getUnitCost() + node.getEdge(min).getFixedCost())) {
+                                min = j;
+                            }
                         }
                     }
-                    else
-                        sol.setAssignement(indice, 0) ;
+                    int indice = node.getEdgeIndice(min);
+                    sol.setAssignement(indice, (int) Math.min(qty, node.getEdge(min).getCapacity()));
+                    arcUsed.add(new Integer(min));
+                    qty -= (int) Math.min(qty, node.getEdge(min).getCapacity());
+                    if (qty <= 0)
+                        allsent = true;
 
                 }
-                // Last edge is fully loaded
-                //int indice = node.getEdgeIndice(node.getNbrEdges()-1) ;
-                //sol.setAssignement(indice, -node.getDemand()) ;
             }
+
         }
+
 
         // Second part : platform
         tabRemainingDemand = new int[problem.getNbrNodes()+1] ;
@@ -159,7 +170,7 @@ public class MySolver extends GSolver {
 
         sol.evaluate();
 
-        System.out.println("First assignment="+sol.toString()) ;
+        System.out.println("First BEST Solution="+sol.toString()) ;
 
         return sol;
     }
