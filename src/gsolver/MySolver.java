@@ -243,8 +243,6 @@ public class MySolver extends GSolver {
      *
      */
     private void recursiveSearch(int key, int indiceTab, int parentBorneMin) {
-        if (getEnoughtTime()){
-
 
             // Test if solution is finished
             if (key==KEY_PLATFORM && indiceTab>=tabPlatforms.length) {
@@ -465,9 +463,7 @@ public class MySolver extends GSolver {
                 }
 
             }
-        }else{
-            this.stopSolver();
-        }
+
     }
 
     private int[] calculerplateformes() {

@@ -1,161 +1,178 @@
-\documentclass[french]{article}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[a4paper]{geometry}
-\usepackage{babel}
-\usepackage{listings}
-\usepackage{color}
+\documentclass[11pt,a4paper,titlepage]{article} 
+\usepackage[utf8]{inputenc} 
+\usepackage[french]{babel} 
+\usepackage[T1]{fontenc} 
+\usepackage{amsmath} 
+\usepackage{amsfonts} 
+\usepackage{amssymb} 
+\usepackage{graphicx} 
+\usepackage[final]{pdfpages} 
+\usepackage[toc,page]{appendix} 
+\usepackage[top=2.5cm,bottom=2.5cm,right=2.5cm,left=2.5cm]{geometry} 
+\usepackage{minted}
+\author{GLANGINE Geoffrey, SENE Victor } 
+\title{Transshipment problem} 
+\graphicspath{{Images/}} 
+\usepackage{fancyhdr} 
+\pagestyle{fancy} 
+\usepackage{lastpage} 
+\renewcommand
+\headrulewidth{1pt} 
+\fancyhead[L]{Transshipment} 
+\fancyhead[C]{GLANGINE Geoffrey SENE Victor} 
+\fancyhead[R]{AG41 UTBM} 
+\renewcommand
+\footrulewidth{1pt} 
+\fancyfoot[C]{\textbf{Page \thepage}} 
+\fancyfoot[L]{Printemps 2016}
 
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
-\lstdefinestyle{mystyle}{
-	backgroundcolor=\color{backcolour},   
-	commentstyle=\color{codegreen},
-	keywordstyle=\color{magenta},
-	numberstyle=\tiny\color{codegray},
-	stringstyle=\color{codepurple},
-	basicstyle=\footnotesize,
-	breakatwhitespace=false,         
-	breaklines=true,                 
-	captionpos=b,                    
-	keepspaces=true,                 
-	numbers=left,                    
-	numbersep=5pt,                  
-	showspaces=false,                
-	showstringspaces=false,
-	showtabs=false,                  
-	tabsize=2
-}
-
-\lstset{style=mystyle}
-
-
-
-\author{Geoffrey GLANGINE \& Victor SENE}
-\title{Projet AG41 - Problème de transbordement}
 \begin{document}
-\maketitle
-Dans ce projet, nous avons pour tâche de trouver un de trouver une solution optimale à un problème de transbordement en programmant un solveur capable de prendre en considération plusieurs graphes contraints en paramètre. Nous allons dans un premier temps analyser le problème mathématiquement puis nous considérons les solutions pour résoudre le problème de façon générale.
 
-\section{Modèle mathématique}
-	\subsection{Paramètres}
-	Tout d'abord commençons par définir les différents paramètres qui comptabilise le nombre nœuds. Ces paramètres sont de type entier : 
-	\begin{itemize}
-		\item $f$ : représente le nombre de fournisseurs
-		\item $p$ : représente nombre de plateformes de transbordement
-		\item $c$ : représente nombre de clients
-	\end{itemize}
-	
-	À présent voici les propriétés des arcs partant d'un nœud i vers un nœud j :
-	\begin{itemize}
-		\item$u_{ij}$ : capacité d'un arc de type entier
-		\item $c_{ij}$ : coût fixe d'utilisation d'un arc
-		\item $h_{ij}$ : coût par objet transporté
-		\item $t_{ij}$ : temps de transport sur l'arc de type entier 
-	\end{itemize}
-	
-	Et enfin pour les plateformes i :
-	\begin{itemize}
-		\item $g_{i}$ : coût de transbordement unitaire
-		\item $s_{i}$ : temps de transbordement de type entier
-	\end{itemize}
-	
-	\subsection{Variables}
-	Dans ce problème notre variable principale concerne la quantité de produit sur un arc :
-	\begin{itemize}
-		\item $x_{ij}$ : nombre de produit acheminé sur un arc dont le départ est i et va vers j.
-		\item Pour les besoins du modèle mathématique j'introduis une variable binaire qui me permettra d'ignorer les coûts fixes des arcs non-utilisés $y_{ij}$.
-	\end{itemize}
-	\subsection{Objectif}
-	Nous avons pour but dans ce problème de minimiser le coût du transport tout en maximisant le nombre de produit transporté.
-	
-	$\sum_{i=1}^{f} \sum_{j=1}^{p}(x_{ij} \times h_{ij} + y_{ij} \times (c_{ij} + g_{j}))) + \sum_{i=1}^{p} \sum_{j=1}^{c}(x_{ij} \times h_{ij} + y_{ij} \times c_{ij}) $
-	
-	\subsection{Contraintes}
-	\begin{itemize}
-		\item $x_{ij} \leq u_{ij} * y_{ij}$ : ainsi l'arc ne supportera pas plus que ça capacité et s'il n'est pas utilisé alors rien ne doit être transporté sur l'arc.
-		\item $t_{ij} + s_{i} + t_{ij} \leq T$ : T est le temps de trajet maximum à ne pas dépasser. 
-		\item $\forall i, \sum_{j=1}^{n+f+c}(x_{ij} - x_{ji}) = - b_{i}$ : ceci est une contrainte de conservation des marchandises afin que ce qui parte d'un fournisseur soit égal à ce que reçois le client.
-	\end{itemize}
-	
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page. The '~' is needed because \\
+% only works if a paragraph has started.
+%\includegraphics[width=0.15\textwidth]{./logo}~\\[1cm]
+
+\textsc{\LARGE Université de technologie Belfort-Montbéliard}\\[1.5cm]
+
+\textsc{\Large Problème de Transbordement}\\[0.5cm]
+
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries AG41 Optimisation et Recherche Opérationnelle\\[0.4cm] }
+
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Auteur:}\\
+\textsc{GLANGINE} Geoffrey\\
+\textsc{SENE} Victor\\
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Professeur:} \\
+GRUNDER \textsc{Olivier}
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+
+\end{center}
+\end{titlepage}
+%\tableofcontents
+%\pagebreak
+
+
+\section{Problème Mathématique}
+
+\subsection{Les Paramètres du problème}
+
+$N$ est un Noeud\\
+$f$ est un Noeud fournisseur\\
+$c$ est un Noeud client\\
+$r$ est un noeud de routage\\
+$b_i$ est le nombre de produit disponible sur un Noeud. Si c'est négatif, le Noeud est un Noeud client, Si c'est positif, le Noeud est un Noeud fournisseur, sinon le Noeud est un Noeud de routage\\
+$u_{ij}$ est la capacité d'un arc\\
+$c_{ij}$ est le coût fixe d'utilisation d'un arc\\
+$h_{ij}$ est le coût unitaire de transport\\
+$t_{ij}$ est le temps de transport\\
+$g_i$ est le coût unitaire de transport sur un Noeud\\
+$s_i$ est le temps de transbordement sur un Noeud\\
+$T$ est le délai max de $f$ à $t$\\
+
+\subsection{Les variables}
+
+$X_{ij}$ est le nombre de produits sur un arc $ij$\\
+$Y_{ij}=1\ si\ X_{ij}>0$ \\
+
+\subsection{Fonction Objectif}
+
+$min\ z =\sum_{i=1}^n \sum_{j=1}^n (c_{ij}\times y_{ij} +X_{ij}\times h_{ij} +g_j \times X_{ij})$
+
+\subsection{Contraintes}
+
+$\forall i\ depot\ \sum_{j=1}^{n} X_{ij} = -b_i$\\
+$\forall j\ client\ \sum_{i=1}^{n} X_{ij} = b_j$\\
+$X_{ij}\leq u_{ij}\times y_{ij}$\\
+$\forall i\ plateforme,\ depot\ \sum_{j=1}^{n} X_{ji} = \sum_{j=1}^{n} X_{ij}$\\
+$\forall i,j,k\ \ \ \  t_{ij} + s_{j} > T_{ik}\Rightarrow y_{ij} + y{jk} \leq 1$\\
+
 \section{Résolution}
-Afin de pouvoir structurer la recherche, nous avons préféré une méthode de résolution généraliste tel que le Branch and Bounds car l'utilisation de celui-ci pour des problèmes légèrement différents serait possible. Le but sera de faire une recherche arborescente avec comme critère pour séparer les branches de l'arbre binaire la condition de passage ou non par un arc donné. Le coût de la solution sera évaluée à chaque nœud permettant de réduire l'arbre si ce coup est supérieur à celui de la borne min. 
-Un algorithme de Fulkerson pourra être envisagé en complément pour trouver des flux viables pour le transport de marchandise.
+Afin de pouvoir structurer la recherche, nous avons préféré une méthode de résolution généraliste tel que le Branch and Bound car l'utilisation de celui-ci pour des problèmes légèrement 
+différents serait possible. Mais le problème est que les algorithme d'optimisation "généralistes" sont généralement moins efficaces que les algorithmes dits "dédiés". Un algorithme de branch and bound a pour objectif 
+de diviser un problème en sous-problèmes plus simples à résoudre. Cette division se fait sous forme d'énumération des solutions sous forme d'un arbre. Chaque branche est donc un nouveau problème à résoudre 
+et en programmation cela se fait facilement en utilisant la récursivité. Mais l'algorithme de séparation-évaluation ne se contente pas de simplement énumérer le problème, il essaie aussi, dès qu'il est possible 
+de "couper une branche à l'arbre" si il juge que cette branche ne mènera qu'a des solutions qui sont moins bonne qu'une solution que l'on a déjà trouvé au préalable. Suivant l'efficacité de ce choix,
+l'algorithme aura beaucoup moins de sous problèmes à évaluer et gagnera donc en temps d'exécution. 
 
 
 \section{Implémentation}
-L'objectif ici est de montrer l'évolution de la réflexion au court du projet. Tout d'abord nous pouvons agir sur plusieurs points afin d'accélérer la recherche : l'efficacité de la borne min, l'approximation par la première solution, l'ordre de visite des edges en fonctions de leur coût. Ainsi nous avons commencé par chercher un moyen d'améliorer notre borne min.
+L'objectif ici est de montrer l'évolution de la réflexion au cours du projet. Tout d'abord nous pouvons agir sur plusieurs points afin d'accélérer la recherche : 
+l'efficacité de la borne min, le choix d'une bonne première solution, l'ordre de visite des arcs en fonctions de leur coût. Ainsi nous avons commencé par chercher un moyen d'améliorer notre borne min.
 	\subsection{Recherche d'une borne min}
-	La première borne min utilisée était calculée à partir de l'évaluation de la solution de départ comme borne permettant la coupe des arcs.
-	Puis ....
-	Enfin ....
+Tout d'abord, pour se familiariser avec le problème et l'algorithme, la borne minimale était calculée de manière très simple. En effet, la borne minimale était seulement l'évaluation de la solution en cours
+de création. Il n'y avait donc aucun calcul à faire. Cette borne min ne parait pas très efficace, ni très réfléchie, mais elle nous à permis de prendre connaissance de l'algorithme d'énumération et de faire 
+une première coupe. Notre temps d'exécution s'est un peu amélioré, mais nous nous attendions et nous avons donc remarqué que le temps d'exécution n'était pas à la hauteur des attentes concernant le projet.
+Cette borne min n'était pas très subtile, mais elle nous à permis de réaliser une première coupe sans avoir à implémenter de calcul complexe. C'était simplement un petit essai pour s'assurer d'avoir
+compris le problème avant de commencer le gros travail.
+ 
+ Ensuite, nous avons réfléchi à un calcul de borne minimale plus conséquent. Nous avons donc choisi de calculer le coût de tous les produits qui transitaient des fournisseurs vers les plate-formes de transbordement
+ et ensuite de calculer combien, au minimum nous coûterais le transfert des produits depuis les plate-formes, vers les clients. Nous regardons donc, parmis tous les arcs, lequel coûte le moins cher 
+ et si la plate-forme possède moins ou autant de produit que le client en demande elle envoie tout ses produits sur cet arc et on passe à la plate-forme suivante. Si il y a plus de produit sur la plate-forme que 
+ le client en demande, alors on cherche le second arc le moins cher.
+ 
+ C'est notre solution actuelle pour calculer notre borne minimale. Mais nous savons qu'elle n'est pas forcément la meilleure borne minimale pour ce problème. En effet, même si l'on regarde si la demande
+ du client est plus grande que la disponibilité sur la plate-forme et que l'on cherche d'autres arcs pour envoyer le reste des produits au autres client si un arc est saturé, On enregistre pas quels 
+ clients sont déjà livrés en passant à la seconde plate-forme. Il est donc possible que ce calcul de borne minimal essaie d'envoyer des produits à un client depuis plusieurs plate-formes même si
+ celui-ci est déjà satisfait. Ce problème fait que notre borne minimale est un peu moins haute que si elle était optimale, mais il n'influe en rien sur le résultat final. En effet ce n'est que si la
+ borne minimale est trop haute que l'on peux "oublier" de passer par le résultat optimal. Par contre ce problème influe un petit peu sur l'efficacité de notre algorithme. Mais vis à vis de la difficulté 
+ à le mettre en place et du risque d'avoir une borne minimale trop haute, Nous avons décidé de ne pas changer notre méthode de calcul de borne minimale.
 	
 	\subsection{La première solution}
-	Après une étude de la première solution fournie dans le code nous avons décidé de chercher un moyen de construire plus efficacement cette première solution. Nous avons ainsi décidé de remplir les arcs aux maximum de leur capacité et de répartir ainsi les produits jusqu'à avoir répondu à la demande.
-	
-	Pour un dépôts :
-	\begin{lstlisting}[language=Java]
-		for (int i=0;i<problem.getNbrNodes();i++) {
-			GNode node = problem.getNode(i) ;
-			if (node.isDepot()) {
-				int qty=-node.getDemand();
-				for (int j=0;j<node.getNbrEdges()-1;j++) {
-					int indice = node.getEdgeIndice(j) ;
-					//Prise en compte de la capacite des arcs
-					if(qty>0) {
-						int capacity=node.getEdge(j).getCapacity();
-						if(capacity>=qty){
-							sol.setAssignement(indice, qty);
-							qty=0;
-						}
-						else{
-							sol.setAssignement(indice,capacity);
-							qty-=capacity;
-						}
-					}
-					else
-						sol.setAssignement(indice, 0) ;
-				}
-			}
-		}
-	\end{lstlisting}
-	Pour un nœud de transbordement nous testons les différents arcs et s'ils pointent vers ce nœud alors nous ajoutons les produits sur le nœud et actualisons le coût total de la solution.
-	
-	\subsection{Capacité des arcs}
-	Si chaque arc vise à relié deux nœuds ils ne sont pas tous identiques. Il faut donc prendre en compte la capacité de chaque arc afin de ne pas y assigner plus de produit que possible. Nous avons donc commencé par le prendre en compte dans la solution initiale :
-	\begin{lstlisting}[language=Java, caption=Test capacité des arcs]
-		if(capacity>=qty){
-			sol.setAssignement(indice, qty);
-			qty=0;
-		}
-		else{
-			sol.setAssignement(indice,capacity);
-			qty-=capacity;
-		}
-	\end{lstlisting}
-	Lors du parcours du graphe et de l'ajout des produits aux différents arcs il faut aussi prendre en compte cette capacité. Nous avons remarqué que cependant tous les produits étaient assignés au dernier arc si on avait pas réussi à répartir sur les arcs précédent. Nous avons donc ajouté une condition empêchant la récursivité si les produits ne sont pas bien répartis :
-	\begin{lstlisting}[language=Java]
-		if (!allCombinationsExplored &&
-			!(currentSolution.getAssignement(edgeindice) > currentNode.getEdge(currentNode.getNbrEdges()-1).getCapacity())) 
-			{ [...] }
-	\end{lstlisting}
-	
+	Comme pour le calcul de la borne minimale, nous avons du passer par deux étapes pour calculer la première solution. En effet la fonction de calcul de première solution proposée dans les annexes fournies 
+	avec le projet ne donnait pas de solution correcte. En effet cette solution ne respectait pas la capacité des arcs. Donc nous avons commencé par créer une solution respectant la capacité des arcs. 
+	pour créer cette solution nous avons fait ceci :
+	\begin{minted}{C}
+		Pour chaque Depot :
+		    Pour chaque arc :
+		        si(-depot.demande>=arc.capacité)
+		            depot.demande+=arc.capacité
+		            remplir l'arc jusqu'a sa capacité maximale
+		        sinon 
+		            remplir l'arc avec tous les produits disponibles 
+		            dans le depot
+		Pour chaque plateforme:
+		    compter le nombre de produits qui arrivent sur cette plateforme
+		    satisfaire la demande client en commençant de la 
+		    plateforme n°1 vers le client n°1
+		            
+	\end{minted}
+        Mais une fois de plus cette première solution était naïve, et il fallait trouver quelque chose de mieux. C'est pour cela que nous avons décidé de choisir le chemin le moins cher depuis chaque dépôt pour 
+        aller au plate-formes. Nous estimons ce coût en fonction d'un ratio entre le nombre de produits transbordés, le coût unitaire et le coût fixe. 
+        Cette solution initiale donne des résultats qui ne sont pas très éloignés des solutions optimales pour les petits problèmes, mais il est une fois de plus possible de l'améliorer en implémentant 
+        l'algorithme de ford fulkerson qui est un algorithme utilisé pour le problème du flot maximum qui ressemble beaucoup à notre problème. Mais nous avons choisi de ne pas implémenter cet algorithme car 
+        sa difficulté d'implémentation ne parait pas vraiment justifiée pour simplement calculer une première solution.  	
 	
 	\subsection{Nos solutions}
-	Nous avons remarqué que nos résultats approchent la solution optimale demandée mais ne la donne pas toujours car notre méthode d'énumération des chemins possibles n'est pas complètement fiables. Cependant pour un algorithme généralisé il nous semble que le temps de calcul des solutions est relativement raisonnable :
+	Nous avons remarqué que nos résultats approchent la solution optimale demandée mais ne la donne pas toujours car notre méthode d'énumération des chemins possibles n'est pas complètement fiable. Cependant pour un algorithme généralisé il nous semble que le temps de calcul des solutions est relativement raisonnable :
 
 	
 \section{Des problèmes et des solutions}
 	\subsection{Les problèmes rencontrés}
-	Nous avons décidé d'utiliser le code fourni pour nous baser dessus et le rendre rapidement opérationnel. Cependant le volume à assimilé que représentait déjà à la base le programme nous a fortement ralenti. Si nous avions à refaire le projet nous repartirions de zéro pour une meilleur maîtrise de l'ensemble du code.
-	Nous aurions pu aussi améliorer notre démarche en utilisant un langage plus pratique pour ce genre de problème : le Python.
-	
+	Nous avons décidé d'utiliser le code fourni pour nous baser dessus et le rendre rapidement opérationnel. Cependant le volume à assimiler que représentait déjà à la base le programme nous a fortement ralenti. Si nous avions à refaire le projet nous repartirions de zéro pour une meilleur maîtrise de l'ensemble du code.
 	\subsection{Les optimisations possibles}
-	Il nous ait clairement apparu que nous pourrions améliorer notre projet en revoyant notre méthode d'énumération mais cela changerait aussi l'essence même du parcours du graphe impliquant des changements assez profond dans notre code.
+	Il nous est clairement apparu que nous pourrions améliorer notre projet en revoyant notre méthode d'énumération mais cela changerait aussi l'essence même du parcours du graphe impliquant des changements assez profond dans notre code.
 	Il nous restera encore aussi à afficher un message d'erreur lorsque les solutions ne sont pas possibles.
+
 
 \end{document}

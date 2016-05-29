@@ -48,7 +48,7 @@ public abstract class GSolver extends Thread {
 	/**
 	 * maximum time to run the solver
 	 */
-	protected long solvingTime=900000000 ;
+	protected long solvingTime=-1 ;
 	
 	/**
 	 * random generator to use for stochastic techniques
@@ -93,14 +93,6 @@ public abstract class GSolver extends Thread {
 		long time = new Date().getTime() ; 
 		elapsedTime = time-startTime ;
 		return elapsedTime;
-	}
-
-	public boolean getEnoughtTime(){
-		if (elapsedTime <= solvingTime){
-			return true;
-		}
-		else
-			return false;
 	}
 
 	/**
@@ -172,11 +164,13 @@ public abstract class GSolver extends Thread {
 	 */
 	public class GStopSolver extends Thread {
 		public void run() {
-			boolean encore=true ;
+
+            boolean encore=true ;
 			while (encore) {
-				if (thread==null || !thread.isAlive()) encore = false ;
+
+                if (thread==null || !thread.isAlive()) encore = false ;
 				long elapsedTime = getElapsedTime() ;
-				if (elapsedTime>=solvingTime) 
+                if (elapsedTime>=solvingTime)
 					encore = false ;
 				else {
 					try {
@@ -184,7 +178,8 @@ public abstract class GSolver extends Thread {
 					} catch (Exception e) {}						
 				}				
 			}
-			stopSolver() ;
+
+            stopSolver() ;
 		}
 	}
 
@@ -193,7 +188,9 @@ public abstract class GSolver extends Thread {
 		System.out.println("Gsolver.run(): solvingTime="+solvingTime) ;
 		thread = this ;
 		startTime = new Date().getTime() ; 
-		if (solvingTime>0) this.new GStopSolver().start() ;
+		if (solvingTime>0) {
+            this.new GStopSolver().start();
+        }
 		System.out.println("calling solve()") ;
 		solve() ;
 	}
@@ -211,6 +208,7 @@ public abstract class GSolver extends Thread {
 		log.println ("END OF THE SOLVING TIME : " + getElapsedTimeString()) ;
 		assert bestSolution!=null : "stopSolver(): bestSolution="+bestSolution ;
 		log.println ("bestSolution = "+bestSolution.getEvaluation()) ;
+
 	}
 	
 	/**
